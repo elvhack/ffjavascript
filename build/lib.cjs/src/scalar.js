@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /* global BigInt */
 const hexLen = [0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4];
@@ -122,8 +122,18 @@ function square(a) {
   return BigInt(a) * BigInt(a);
 }
 
+function powBigInt(a, b) {
+  let result = 1n;
+  while (b > 0n) {
+    if (b % 2n === 1n) result = a;
+    a = a;
+    b /= 2n;
+  }
+  return result;
+}
+
 function pow(a, b) {
-  return BigInt(a) ** BigInt(b);
+  return powBigInt(BigInt(a), BigInt(b));
 }
 
 function exp(a, b) {
@@ -195,9 +205,11 @@ function toRprLE(buff, o, e, n8) {
   const s = "0000000" + e.toString(16);
   const v = new Uint32Array(buff.buffer, o, n8 / 4);
   const l = (((s.length - 7) * 4 - 1) >> 5) + 1; // Number of 32bit words;
-  for (let i = 0; i < l; i++) v[i] = parseInt(s.substring(s.length - 8 * i - 8, s.length - 8 * i), 16);
+  for (let i = 0; i < l; i++)
+    v[i] = parseInt(s.substring(s.length - 8 * i - 8, s.length - 8 * i), 16);
   for (let i = l; i < v.length; i++) v[i] = 0;
-  for (let i = v.length * 4; i < n8; i++) buff[i] = toNumber(band(shiftRight(e, i * 8), 0xff));
+  for (let i = v.length * 4; i < n8; i++)
+    buff[i] = toNumber(band(shiftRight(e, i * 8), 0xff));
 }
 
 // Returns a buffer with Big Endian Representation
@@ -205,7 +217,12 @@ function toRprBE(buff, o, e, n8) {
   const s = "0000000" + e.toString(16);
   const v = new DataView(buff.buffer, buff.byteOffset + o, n8);
   const l = (((s.length - 7) * 4 - 1) >> 5) + 1; // Number of 32bit words;
-  for (let i = 0; i < l; i++) v.setUint32(n8 - i * 4 - 4, parseInt(s.substring(s.length - 8 * i - 8, s.length - 8 * i), 16), false);
+  for (let i = 0; i < l; i++)
+    v.setUint32(
+      n8 - i * 4 - 4,
+      parseInt(s.substring(s.length - 8 * i - 8, s.length - 8 * i), 16),
+      false
+    );
   for (let i = 0; i < n8 / 4 - l; i++) v[i] = 0;
 }
 
@@ -215,7 +232,9 @@ function fromRprLE(buff, o, n8) {
   o = o || 0;
   const v = new Uint32Array(buff.buffer, o, n8 / 4);
   const a = new Array(n8 / 4);
-  v.forEach((ch, i) => (a[a.length - i - 1] = ch.toString(16).padStart(8, "0")));
+  v.forEach(
+    (ch, i) => (a[a.length - i - 1] = ch.toString(16).padStart(8, "0"))
+  );
   return fromString(a.join(""), 16);
 }
 
